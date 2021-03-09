@@ -1,3 +1,7 @@
+// Hi!
+// Please use the front-end located "osa3/phonebook_client"
+
+
 const { response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
