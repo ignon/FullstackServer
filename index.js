@@ -1,58 +1,45 @@
 // Hi!
 // Please use the front-end located "osa3/phonebook_client"
 
-
+// Terminal might show "MongoError: circular dependency" error, which is "safe to ignore" error in MongoDB Node drivers:
+// https://developer.mongodb.com/community/forums/t/warning-accessing-non-existent-property-mongoerror-of-module-exports-inside-circular-dependency/15411
+require('dotenv').config()
 const { response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
+const mongoose = require('mongoose')
+const Person = require('./models/person')
 
 morgan.token('res_body', function (req, res) { return JSON.stringify(req.body) })
 
 const PORT = process.env.PORT || 3001
-
 
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))
 app.use(morgan(':method :url :status - :res_body - :response-time ms'))
 
-let persons = [
-    {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": 1
-    },
-    {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-    },
-    {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": 4
-    }
-]
+
 
 app.get('/api/persons', (request, response) => {
-    debugger
-    
-    response.json(persons)
+    Person.find({}).then(persons => {
+        response.json(persons)
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const personID = Number(request.params.id)
-    const person = persons.find(p => p.id === personID)
+    const personID = request.params.id
 
-    if (!person) {
-        response.status(404).end()
-        return;
-    }
+    Person.findById(personID).then(person => {
+        response.json(person)
+    })
 
-    response.json(person)
-
+    // if (!person) {
+    //     response.status(404).end()
+    //     return;
+    // }
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -73,9 +60,6 @@ app.post('/api/persons', (request, response) => {
         return;
     }
 
-    console.log('1');
-    
-
     const {name, number} = request.body
     
     if (!name || typeof name !== 'string') {
@@ -88,22 +72,17 @@ app.post('/api/persons', (request, response) => {
         return;
     }
 
-    const duplicate = persons.find(p => p.name == name) 
-    if (duplicate) {
-        respondError('Name must be unique')
-        return;
-    }
+    // const duplicate = persons.find(p => p.name == name) 
+    // if (duplicate) {
+    //     respondError('Name must be unique')
+    //     return;
+    // }
 
-    const person = {
-        name,
-        number,
-        id: Math.floor(
-            Math.random() * Number.MAX_SAFE_INTEGER
-        )
-    }
+    const person = new Person({name, number})
 
-    persons = persons.concat(person)
-    response.json(person)
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
 })
 
 
