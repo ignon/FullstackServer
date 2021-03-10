@@ -9,7 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "git push heroku master",
     "build:ui": "shx rm -rf build && cd ../fullstack/osa3/phonebook_client && npm run build --prod && shx cp -r build ../../../fullstack_server",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy"
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
+    "logs:prod": "heroku logs --tail"
   },
   "author": "Arttu Mäkinen",
   "license": "ISC",
@@ -21,6 +22,7 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "mongoose": "^5.11.19",
     "morgan": "^1.10.0"
   },
   "engine": {

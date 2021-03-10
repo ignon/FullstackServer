@@ -12,10 +12,11 @@ morgan.token('res_body', function (req, res) { return JSON.stringify(req.body) }
 
 const PORT = process.env.PORT || 3001
 
+
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))
-app.use(morgan(':method :url :status - :res_body - :response-time ms')) //'combined'
+app.use(morgan(':method :url :status - :res_body - :response-time ms'))
 
 let persons = [
     {
@@ -36,6 +37,8 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
+    debugger
+    
     response.json(persons)
 })
 
@@ -100,7 +103,6 @@ app.post('/api/persons', (request, response) => {
     }
 
     persons = persons.concat(person)
-
     response.json(person)
 })
 
@@ -119,7 +121,6 @@ app.get('/info', (request, response) => {
     response.setHeader('Content-Type', 'text/html')
     response.send(page)
 })
-
 
 
 app.listen(PORT, () => {
