@@ -20,8 +20,16 @@ mongoose.connect(url, {
 
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String
+    name: {
+        type: String,
+        minlength: 1,
+        required: true
+    },
+    number: {
+        type: String,
+        minlength: 1,
+        required: true
+    }
 }, {
     pluralize: false
 })

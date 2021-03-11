@@ -49,36 +49,58 @@ app.delete('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
+const createPersonObject = (requestBody) => {
 
-app.post('/api/persons', (request, response, next) => {
-    const respondError = (error, status=400) => {
-        response.status(status).json({error})
+    if (!requestBody) {
+        throw {error: 'Request body must contain person in JSON format'}
     }
 
-    if (!request.body) {
-        respondError('Request body must contain person in JSON format')
-        return;
-    }
+    const {name, number} = requestBody
 
-    const {name, number} = request.body
-    
     if (!name || typeof name !== 'string') {
-        respondError('Field "name" must be a non-empty string')
-        return;
+        throw {error: 'Field "name" must be a non-empty string'}
     }
 
     if (!number || typeof number !== 'string') {
-        respondError('Field "number" must be a non-empty string')
-        return;
+        throw {error: 'Field "number" must be a non-empty string'}
     }
 
-    // const duplicate = persons.find(p => p.name == name) 
-    // if (duplicate) {
-    //     respondError('Name must be unique')
-    //     return;
-    // }
+    const person = {name, number}
+    return person
+}
 
-    const person = new Person({name, number})
+app.put('/api/persons/:id', (request, response, next) => {
+
+    let person
+    try {
+        person = createPersonObject(request.body)
+    }
+    catch(error) {
+        response.status(400).json(error)
+        return
+    }
+
+    const personID = request.params.id
+    Person.findByIdAndUpdate(personID, person, {new: true})
+        .then(result => {
+            response.status(200).json(result)
+        })
+        .catch(error => next(error))
+})
+
+
+app.post('/api/persons', (request, response, next) => {
+
+    let personObject 
+    try  {
+        personObject = createPersonObject(request.body)
+    }
+    catch(error) {
+        response.status(400).json(error)
+        return
+    }
+
+    const person = new Person(personObject)
 
     person.save().then(savedPerson => {
         response.json(savedPerson)
