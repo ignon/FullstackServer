@@ -9,7 +9,7 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
-const mongoose = require('mongoose')
+
 const Person = require('./models/person')
 
 morgan.token('res_body', function (req, res) { return JSON.stringify(req.body) })
@@ -20,7 +20,6 @@ app.use(cors()) // ??
 app.use(express.static('build'))
 app.use(express.json())
 app.use(morgan(':method :url :status - :res_body - :response-time ms'))
-
 
 
 app.get('/api/persons', (request, response, next) => {
@@ -70,7 +69,7 @@ const createPersonObject = (requestBody) => {
 }
 
 app.put('/api/persons/:id', (request, response, next) => {
-
+    console.log('YEEET')
     let person
     try {
         person = createPersonObject(request.body)
@@ -81,7 +80,8 @@ app.put('/api/persons/:id', (request, response, next) => {
     }
 
     const personID = request.params.id
-    Person.findByIdAndUpdate(personID, person, {new: true})
+    console.log(personID)
+    Person.findByIdAndUpdate(personID, person, {new: true}) /*, runValidators: true, context: 'query'*/
         .then(result => {
             response.status(200).json(result)
         })
@@ -91,18 +91,11 @@ app.put('/api/persons/:id', (request, response, next) => {
 
 app.post('/api/persons', (request, response, next) => {
 
-    let personObject 
-    try  {
-        personObject = createPersonObject(request.body)
-    }
-    catch(error) {
-        response.status(400).json(error)
-        return
-    }
-
-    const person = new Person(personObject)
+    const {name, number} = request.body
+    const person = new Person({name, number})
 
     person.save().then(savedPerson => {
+        console.log(typeof savedPerson);
         response.json(savedPerson)
     })
     .catch(error => next(error))
@@ -124,7 +117,6 @@ app.get('/info', (request, response) => {
     response.send(page)
 })
 
-
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 })
@@ -134,10 +126,13 @@ const unknownEndpoint = (request, response) => {
     response.status(404).send({error: 'unknown endpoint'})
 }
 const errorHandler = (error, request, response, next) => {
-    console.log(error.message) 
+    console.log('Error handler: ', error.message) 
     
     if (error.name === 'CastError') {
-        return response.status(400).send({error: 'malformatted id'})
+        return response.status(400).json({error: 'malformatted id'})
+    }
+    else if (error.name === 'ValidationError') {
+        return response.status(400).json({error: error.message})
     }
     next(error)
 }
