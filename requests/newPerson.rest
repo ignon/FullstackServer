@@ -1,7 +1,7 @@
-POST http://localhost:3001/api/persons
+POST https://arden-servu.herokuapp.com/api/persons
 Content-Type: application/json
 
 {
-    "name": "ardeh",
+    "name": "Ar",
     "number": "33870970987983"
 }
