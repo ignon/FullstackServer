@@ -4,7 +4,7 @@
 // Terminal might show "MongoError: circular dependency" error, which is "safe to ignore" error in MongoDB Node drivers:
 // https://developer.mongodb.com/community/forums/t/warning-accessing-non-existent-property-mongoerror-of-module-exports-inside-circular-dependency/15411
 require('dotenv').config()
-const { response } = require('express')
+//const { response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
@@ -16,7 +16,7 @@ morgan.token('res_body', function (req, res) { return JSON.stringify(req.body) }
 
 const PORT = process.env.PORT || 3001
 
-app.use(cors()) // ??
+app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
 app.use(morgan(':method :url :status - :res_body - :response-time ms'))
