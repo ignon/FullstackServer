@@ -76,10 +76,11 @@ app.post('/api/persons', (request, response, next) => {
   const {name, number} = request.body
   const person = new Person({name, number})
 
-  person.save().then(savedPerson => {
-    console.log(typeof savedPerson)
-    response.json(savedPerson)
-  })
+  person.save()
+    .then(savedPerson => {
+      console.log(typeof savedPerson)
+      response.json(savedPerson)
+    })
     .catch(error => next(error))
 })
 
