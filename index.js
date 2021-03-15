@@ -31,7 +31,7 @@ app.get('/api/persons', (request, response, next) => {
 
 app.get('/api/persons/:id', (request, response, next) => {
   const personID = request.params.id
-
+  
   Person.findById(personID).then(person => {
     if (person) response.json(person)
     else        response.status(404).end()
