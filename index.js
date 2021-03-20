@@ -3,8 +3,8 @@
 
 // Terminal might show "MongoError: circular dependency" error, which is "safe to ignore" error in MongoDB Node drivers:
 // https://developer.mongodb.com/community/forums/t/warning-accessing-non-existent-property-mongoerror-of-module-exports-inside-circular-dependency/15411
+
 require('dotenv').config()
-//const { response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 const app = express()

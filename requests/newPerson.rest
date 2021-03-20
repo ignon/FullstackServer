@@ -2,6 +2,6 @@ POST https://arden-servu.herokuapp.com/api/persons
 Content-Type: application/json
 
 {
-    "name": "Ar",
+    "name": "Ard",
     "number": "33870970987983"
 }
