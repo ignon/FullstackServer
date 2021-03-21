@@ -67,7 +67,10 @@ app.put('/api/persons/:id', (request, response, next) => {
     .then(result => {
       response.status(200).json(result)
     })
-    .catch(error => next(error))
+    .catch(error => {
+      error.message = `Information of ${personD} has already been removed from the server`
+      next(error)
+    })
 })
 
 
@@ -118,6 +121,7 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).json({error: 'malformatted id'})
   }
   else if (error.name === 'ValidationError') {
+    console.log(error.message)
     return response.status(400).json({error: error.message})
   }
   next(error)
