@@ -31,7 +31,7 @@ app.get('/api/persons', (request, response, next) => {
 
 app.get('/api/persons/:id', (request, response, next) => {
   const personID = request.params.id
-  
+
   Person.findById(personID).then(person => {
     if (person) response.json(person)
     else        response.status(404).end()
@@ -44,7 +44,8 @@ app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(personID)
     .then(result => {
       console.log(result)
-      response.status(204).end()
+      if (result) response.status(204).end()
+      else        response.status(400).json({ error: 'Person has already been removed from the server' })
     })
     .catch(error => next(error))
 })
@@ -56,7 +57,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     name: request.body.name,
     number: request.body.number
   }
-  
+
   const validationError = (new Person(personData)).validateSync()
   if (validationError) {
     return response.status(400).json({
@@ -64,21 +65,19 @@ app.put('/api/persons/:id', (request, response, next) => {
     })
   }
 
-  Person.findByIdAndUpdate(personID, personData, {new: true}) /*, runValidators: true, context: 'query'*/
+  Person.findByIdAndUpdate(personID, personData, { new: true }) /*, runValidators: true, context: 'query'*/
     .then(result => {
-      response.status(200).json(result)
+      if (result) response.status(200).json(result)
+      else        response.status(400).json({ error: `${personData.name} has already been removed from the server` })
     })
-    .catch(error => {
-      error.message = `Information of ${personD} has already been removed from the server`
-      next(error)
-    })
+    .catch(error => next(error))
 })
 
 
 app.post('/api/persons', (request, response, next) => {
 
-  const {name, number} = request.body
-  const person = new Person({name, number})
+  const { name, number } = request.body
+  const person = new Person({ name, number })
 
   person.save()
     .then(savedPerson => {
@@ -113,17 +112,21 @@ app.listen(PORT, () => {
 
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({error: 'unknown endpoint'})
+  response.status(404).send({ error: 'unknown endpoint' })
 }
 const errorHandler = (error, request, response, next) => {
-  console.log('Error handler: ', error.message) 
-    
+  console.log('Error handler: ', error.message)
+
   if (error.name === 'CastError') {
-    return response.status(400).json({error: 'malformatted id'})
+    return response.status(400).json({ error: 'malformatted id' })
   }
   else if (error.name === 'ValidationError') {
     console.log(error.message)
-    return response.status(400).json({error: error.message})
+    return response.status(400).json({ error: error.message })
+  }
+  else if (error.message) {
+    console.log(error.message)
+    return response.status(400).json({ error: error.message })
   }
   next(error)
 }

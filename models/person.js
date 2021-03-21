@@ -19,7 +19,6 @@ mongoose.connect(url, {
     console.log('error connecting to MongoDB:', error.message)
   })
 
-
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -44,6 +43,6 @@ personSchema.set('toJSON', {
     delete returnedObject.__v
   }
 })
-  
+
 const Person = mongoose.model('Person', personSchema, 'persons')
 module.exports = Person
