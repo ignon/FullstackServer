@@ -43,6 +43,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
   const personID = request.params.id
   Person.findByIdAndRemove(personID)
     .then(result => {
+      console.log(result)
       response.status(204).end()
     })
     .catch(error => next(error))
